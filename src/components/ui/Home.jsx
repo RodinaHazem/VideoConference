@@ -17,11 +17,14 @@ export default function Home(){
         auth.signOut()
         navigate("/")
     }
+        const handlevideoCall = ()=>{
+        navigate("/VideoCall")
+    }
   return (
     <>
         <h1>Ho</h1>
           <Button onClick={handlesignout}>Logout</Button>
-          <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Vitae ullam animi consequuntur vel quod, cumque cum quae iste necessitatibus aliquid a commodi, eligendi molestiae, optio harum facere nemo exercitationem ipsam!</p>
+          <Button onClick={handlevideoCall}>VideoCall</Button>
     </>
   )
 }   

@@ -8,6 +8,7 @@ import SetNewPassword from "./components/auth/Setnewpassword"
 import Home from "./components/ui/Home"
 import { useState, useEffect } from "react"
 import { auth } from "./firebase"
+import VideoCall from "./components/ui/VideoCall"
 
 
 const App = () => {
@@ -30,6 +31,7 @@ const App = () => {
         { path: "/reset-password", element: user ? <Navigate to="/"/> : <ResetPassword /> },
         { path: "/set-new-password", element: user ? <Navigate to="/" /> : <SetNewPassword /> },
         { path: "*", element: <Navigate to="/" /> },
+        { path: "/VideoCall", element: user ? <VideoCall /> : <Navigate to="/" /> },
     ])
 
     return <RouterProvider router={router} />
