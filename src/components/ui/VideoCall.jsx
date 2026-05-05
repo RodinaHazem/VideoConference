@@ -49,7 +49,7 @@ export default function VideoCall() {
             })
         }
         init()
-         return () => {
+        return () => {
         if (clientRef.current) {
           clientRef.current.removeAllListeners();
           clientRef.current.leave();
