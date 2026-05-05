@@ -8,7 +8,7 @@ vi.mock("../../firebase", () => ({
     },
 }))
 
-import Home from "../ui/home"
+import Home from "../ui/Home"
 
 test("renders home page with Logout and VideoCall buttons", () => {
     render(
