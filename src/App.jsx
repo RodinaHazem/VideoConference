@@ -8,8 +8,9 @@ import SetNewPassword from "./components/auth/Setnewpassword"
 import Home from "./components/ui/app/Home"
 import { useState, useEffect, useMemo } from "react"
 import { auth } from "./firebase"
-import VideoCall from "./components/ui/VideoCall"
+import VideoCall from "./components/video/VideoCall"
 import Layout from "./components/ui/common/layout/Layout"
+import { Toaster } from "react-hot-toast"
 
 const App = () => {
     const [user, setUser] = useState(null)
@@ -33,13 +34,18 @@ const App = () => {
         { path: "/signup", element: user ? <Navigate to="/" /> : <SignUp /> },
         { path: "/reset-password", element: user ? <Navigate to="/" /> : <ResetPassword /> },
         { path: "/set-new-password", element: user ? <Navigate to="/" /> : <SetNewPassword /> },
-        { path: "/VideoCall", element: user ? <VideoCall /> : <Navigate to="/" /> },
+        { path: "/VideoCall/:meetingId", element: user ? <VideoCall /> : <Navigate to="/" /> },
         { path: "*", element: <Navigate to="/" /> },
     ]), [user])
 
     if (loading) return null
 
-    return <RouterProvider router={router} />
+    return (
+        <>
+            <RouterProvider router={router} />
+            <Toaster position="top-center" toastOptions={{ duration: 3000 }} />
+        </>
+    )
 }
 
 export default App
