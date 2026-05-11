@@ -51,8 +51,8 @@ const Page = styled.div`
   justify-content: center;
   position: relative;
   overflow: hidden;
-  font-family: 'Inter', system-ui, sans-serif;
-  background: #0a0a14;
+  font-family: "Inter", system-ui, sans-serif;
+  background: #dec9e9;
 `;
 
 const AnimatedBg = styled.div`
@@ -60,12 +60,12 @@ const AnimatedBg = styled.div`
   inset: 0;
   background: linear-gradient(
     135deg,
-    #0a0a14 0%,
-    #0f0e1e 20%,
-    #12102a 40%,
-    #0e1225 60%,
-    #0a0f1e 80%,
-    #0a0a14 100%
+    #dec9e9 0%,
+    #dec9e9 20%,
+    #c19ee0 40%,
+    #dac3e8 60%,
+    #c19ee0 80%,
+    #dac3e8 100%
   );
   background-size: 400% 400%;
   animation: ${gradientShift} 14s ease infinite;
@@ -82,22 +82,28 @@ const Blob = styled.div`
 `;
 
 const Blob1 = styled(Blob)`
-  width: 500px; height: 500px;
-  top: -120px; left: -150px;
-  background: radial-gradient(circle, rgba(99,102,241,0.22) 0%, transparent 70%);
+  width: 500px;
+  height: 500px;
+  top: -120px;
+  left: -150px;
+  background: radial-gradient(circle, #b185db 0%, transparent 70%);
 `;
 
 const Blob2 = styled(Blob)`
-  width: 450px; height: 450px;
-  bottom: -100px; right: -120px;
-  background: radial-gradient(circle, rgba(139,92,246,0.18) 0%, transparent 70%);
+  width: 450px;
+  height: 450px;
+  bottom: -100px;
+  right: -120px;
+  background: radial-gradient(circle, #dec9e9 0%, transparent 70%);
 `;
 
 const Blob3 = styled(Blob)`
-  width: 300px; height: 300px;
-  top: 50%; left: 50%;
+  width: 300px;
+  height: 300px;
+  top: 50%;
+  left: 50%;
   transform: translate(-50%, -50%);
-  background: radial-gradient(circle, rgba(59,130,246,0.12) 0%, transparent 70%);
+  background: radial-gradient(circle, #815ac0 0%, transparent 70%);
 `;
 
 const Card = styled.div`
@@ -107,23 +113,26 @@ const Card = styled.div`
   max-width: 440px;
   margin: 24px;
   padding: 48px 44px 44px;
-  background: rgba(15, 14, 30, 0.72);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.427);
   border-radius: 24px;
   backdrop-filter: blur(28px);
   -webkit-backdrop-filter: blur(28px);
   box-shadow:
-    0 0 0 1px rgba(99, 102, 241, 0.12),
-    0 32px 64px -12px rgba(0, 0, 0, 0.7),
+    0 0 0 1px #815ac023,
+    0 32px 64px -12px #000000b2,
     inset 0 1px 0 rgba(255, 255, 255, 0.06);
   animation: ${fadeInUp} 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
 `;
 
 const LogoBadge = styled.div`
-  width: 60px; height: 60px;
+  width: 60px;
+  height: 60px;
   border-radius: 16px;
-  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
-  display: flex; align-items: center; justify-content: center;
+  background: linear-gradient(135deg, #6247aa 0%, #815ac0 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
   margin: 0 auto 28px;
   font-size: 26px;
   box-shadow: 0 8px 24px rgba(99, 102, 241, 0.45);
@@ -133,7 +142,7 @@ const LogoBadge = styled.div`
 const Title = styled.h1`
   font-size: 26px;
   font-weight: 700;
-  color: #f1f0fe;
+  color: #000;
   text-align: center;
   margin: 0 0 6px;
   letter-spacing: -0.5px;
@@ -156,7 +165,7 @@ const FieldLabel = styled.label`
   display: block;
   font-size: 12px;
   font-weight: 500;
-  color: rgba(161, 161, 188, 0.7);
+  color: #000000b2;
   text-transform: uppercase;
   letter-spacing: 0.5px;
   margin-bottom: 8px;
@@ -165,25 +174,30 @@ const FieldLabel = styled.label`
 const Input = styled.input`
   width: 100%;
   padding: 14px 14px 14px 44px;
-  background: rgba(255, 255, 255, 0.04);
+  background: #0000003b;
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 12px;
-  color: #f1f0fe;
+  color: #000000b2;
   font-size: 14.5px;
   font-family: inherit;
   font-weight: 400;
   box-sizing: border-box;
   outline: none;
-  transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
+  transition:
+    border-color 0.2s,
+    background 0.2s,
+    box-shadow 0.2s;
 
   &::placeholder {
-    color: rgba(161, 161, 188, 0.35);
+    color: #000000b2;
   }
 
   &:focus {
-    border-color: rgba(99, 102, 241, 0.6);
+    border-color: #7251B599;
     background: rgba(99, 102, 241, 0.06);
-    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.14), inset 0 1px 0 rgba(255,255,255,0.04);
+    box-shadow:
+      0 0 0 3px rgba(99, 102, 241, 0.14),
+      inset 0 1px 0 rgba(255, 255, 255, 0.04);
   }
 `;
 
@@ -210,6 +224,11 @@ const RememberRow = styled.div`
   align-items: center;
   justify-content: space-between;
   margin-bottom: 28px;
+  & a {
+    color: #6247aa;
+    font-weight: 600;
+    text-decoration: none;
+  }
 `;
 
 const CheckLabel = styled.label`
@@ -217,13 +236,14 @@ const CheckLabel = styled.label`
   align-items: center;
   gap: 8px;
   font-size: 13px;
-  color: rgba(161, 161, 188, 0.7);
+  color: #000000b2;
   cursor: pointer;
   user-select: none;
 
   input[type="checkbox"] {
-    width: 16px; height: 16px;
-    accent-color: #6366f1;
+    width: 16px;
+    height: 16px;
+    accent-color: #7251b5;
     cursor: pointer;
     border-radius: 4px;
   }
@@ -235,7 +255,7 @@ const SubmitBtn = styled.button`
   padding: 15px;
   border: none;
   border-radius: 12px;
-  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+  background: linear-gradient(135deg, #a06cd5 0%, #6247aa 100%);
   background-size: 200% auto;
   color: #fff;
   font-size: 15px;
@@ -245,15 +265,25 @@ const SubmitBtn = styled.button`
   letter-spacing: 0.2px;
   position: relative;
   overflow: hidden;
-  transition: transform 0.15s, box-shadow 0.2s;
-  box-shadow: 0 4px 20px rgba(99, 102, 241, 0.4);
-  display: flex; align-items: center; justify-content: center; gap: 8px;
+  transition:
+    transform 0.15s,
+    box-shadow 0.2s;
+  box-shadow: 0 4px 20px #6247aa66;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
 
   &::before {
-    content: '';
+    content: "";
     position: absolute;
     inset: 0;
-    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent);
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgba(255, 255, 255, 0.15),
+      transparent
+    );
     background-size: 200% auto;
     animation: ${shimmer} 2.5s linear infinite;
     opacity: 0;
@@ -262,9 +292,11 @@ const SubmitBtn = styled.button`
 
   &:hover:not(:disabled) {
     transform: translateY(-1px);
-    box-shadow: 0 8px 28px rgba(99, 102, 241, 0.5);
+    box-shadow: 0 8px 28px #6247aa7f;
 
-    &::before { opacity: 1; }
+    &::before {
+      opacity: 1;
+    }
   }
 
   &:active:not(:disabled) {
@@ -311,14 +343,16 @@ const SignupPrompt = styled.p`
   text-align: center;
   margin: 28px 0 0;
   font-size: 13.5px;
-  color: rgba(161, 161, 188, 0.65);
+  color: #000000a5;
 
   a {
-    color: #818cf8;
+    color: #6247aa;
     font-weight: 600;
     text-decoration: none;
     transition: color 0.2s;
-    &:hover { color: #a5b4fc; }
+    &:hover {
+      color: #b185db;
+    }
   }
 `;
 

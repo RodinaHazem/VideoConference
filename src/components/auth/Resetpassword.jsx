@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
-import { sendPasswordResetEmail } from 'firebase/auth';
-import { auth } from '../../firebase';
-import styled, { keyframes, createGlobalStyle } from 'styled-components';
-import { Link } from 'react-router-dom';
+import React, { useState } from "react";
+import { sendPasswordResetEmail } from "firebase/auth";
+import { auth } from "../../firebase";
+import styled, { keyframes, createGlobalStyle } from "styled-components";
+import { Link } from "react-router-dom";
 
 /* ─── Global font import ─── */
 const GlobalStyle = createGlobalStyle`
@@ -28,9 +28,9 @@ const fadeInUp = keyframes`
 `;
 
 const pulseRing = keyframes`
-  0%   { transform: scale(0.9); box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.5); }
-  70%  { transform: scale(1);   box-shadow: 0 0 0 14px rgba(99, 102, 241, 0); }
-  100% { transform: scale(0.9); box-shadow: 0 0 0 0 rgba(99, 102, 241, 0); }
+  0%   { transform: scale(0.9); box-shadow: 0 0 0 0 rgba(130, 90, 192, 0.5); }
+  70%  { transform: scale(1);   box-shadow: 0 0 0 14px rgba(130, 90, 192, 0); }
+  100% { transform: scale(0.9); box-shadow: 0 0 0 0 rgba(130, 90, 192, 0); }
 `;
 
 const shimmer = keyframes`
@@ -51,8 +51,8 @@ const Page = styled.div`
   justify-content: center;
   position: relative;
   overflow: hidden;
-  font-family: 'Inter', system-ui, sans-serif;
-  background: #0a0a14;
+  font-family: "Inter", system-ui, sans-serif;
+  background: #dec9e9;
 `;
 
 const AnimatedBg = styled.div`
@@ -60,12 +60,12 @@ const AnimatedBg = styled.div`
   inset: 0;
   background: linear-gradient(
     135deg,
-    #0a0a14 0%,
-    #0f0e1e 20%,
-    #12102a 40%,
-    #0e1225 60%,
-    #0a0f1e 80%,
-    #0a0a14 100%
+    #dec9e9 0%,
+    #dec9e9 20%,
+    #c19ee0 40%,
+    #dac3e8 60%,
+    #c19ee0 80%,
+    #dac3e8 100%
   );
   background-size: 400% 400%;
   animation: ${gradientShift} 14s ease infinite;
@@ -77,36 +77,49 @@ const Blob = styled.div`
   border-radius: 50%;
   filter: blur(80px);
   z-index: 0;
-  animation: ${floatUp} ${({ dur }) => dur || '8s'} ease-in-out infinite;
-  animation-delay: ${({ delay }) => delay || '0s'};
+  animation: ${floatUp} ${({ dur }) => dur || "8s"} ease-in-out infinite;
+  animation-delay: ${({ delay }) => delay || "0s"};
 `;
 
 const Blob1 = styled(Blob)`
-  width: 500px; height: 500px;
-  top: -120px; left: -150px;
-  background: radial-gradient(circle, rgba(99,102,241,0.22) 0%, transparent 70%);
+  width: 500px;
+  height: 500px;
+  top: -120px;
+  left: -150px;
+  background: radial-gradient(circle, #b185db 0%, transparent 70%);
 `;
 
 const Blob2 = styled(Blob)`
-  width: 450px; height: 450px;
-  bottom: -100px; right: -120px;
-  background: radial-gradient(circle, rgba(139,92,246,0.18) 0%, transparent 70%);
+  width: 450px;
+  height: 450px;
+  bottom: -100px;
+  right: -120px;
+  background: radial-gradient(circle, #dec9e9 0%, transparent 70%);
 `;
 
 const Blob3 = styled(Blob)`
-  width: 300px; height: 300px;
-  top: 50%; left: 50%;
+  width: 300px;
+  height: 300px;
+  top: 50%;
+  left: 50%;
   transform: translate(-50%, -50%);
-  background: radial-gradient(circle, rgba(59,130,246,0.12) 0%, transparent 70%);
+  background: radial-gradient(circle, #815ac0 0%, transparent 70%);
 `;
 
 const GridDots = styled.div`
   position: fixed;
   inset: 0;
   z-index: 0;
-  background-image: radial-gradient(rgba(255,255,255,0.04) 1px, transparent 1px);
+  background-image: radial-gradient(
+    rgba(255, 255, 255, 0.04) 1px,
+    transparent 1px
+  );
   background-size: 32px 32px;
-  mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black 40%, transparent 100%);
+  mask-image: radial-gradient(
+    ellipse 80% 80% at 50% 50%,
+    black 40%,
+    transparent 100%
+  );
 `;
 
 const Card = styled.div`
@@ -116,23 +129,26 @@ const Card = styled.div`
   max-width: 440px;
   margin: 24px;
   padding: 48px 44px 44px;
-  background: rgba(15, 14, 30, 0.72);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.427);
   border-radius: 24px;
   backdrop-filter: blur(28px);
   -webkit-backdrop-filter: blur(28px);
   box-shadow:
-    0 0 0 1px rgba(99, 102, 241, 0.12),
-    0 32px 64px -12px rgba(0, 0, 0, 0.7),
+    0 0 0 1px #815ac023,
+    0 32px 64px -12px #000000b2,
     inset 0 1px 0 rgba(255, 255, 255, 0.06);
   animation: ${fadeInUp} 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
 `;
 
 const LogoBadge = styled.div`
-  width: 60px; height: 60px;
+  width: 60px;
+  height: 60px;
   border-radius: 16px;
-  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
-  display: flex; align-items: center; justify-content: center;
+  background: linear-gradient(135deg, #6247aa 0%, #815ac0 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
   margin: 0 auto 28px;
   font-size: 26px;
   box-shadow: 0 8px 24px rgba(99, 102, 241, 0.45);
@@ -142,7 +158,7 @@ const LogoBadge = styled.div`
 const Title = styled.h1`
   font-size: 26px;
   font-weight: 700;
-  color: #f1f0fe;
+  color: #000;
   text-align: center;
   margin: 0 0 8px;
   letter-spacing: -0.5px;
@@ -150,7 +166,7 @@ const Title = styled.h1`
 
 const Subtitle = styled.p`
   font-size: 14px;
-  color: rgba(161, 161, 188, 0.6);
+  color: #000000b2;
   text-align: center;
   margin: 0 0 32px;
   line-height: 1.6;
@@ -165,7 +181,7 @@ const FieldLabel = styled.label`
   display: block;
   font-size: 12px;
   font-weight: 500;
-  color: rgba(161, 161, 188, 0.7);
+  color: #000000b2;
   text-transform: uppercase;
   letter-spacing: 0.5px;
   margin-bottom: 8px;
@@ -174,25 +190,30 @@ const FieldLabel = styled.label`
 const Input = styled.input`
   width: 100%;
   padding: 14px 14px 14px 44px;
-  background: rgba(255, 255, 255, 0.04);
+  background: #0000003b;
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 12px;
-  color: #f1f0fe;
+  color: #000000b2;
   font-size: 14.5px;
   font-family: inherit;
   font-weight: 400;
   box-sizing: border-box;
   outline: none;
-  transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
+  transition:
+    border-color 0.2s,
+    background 0.2s,
+    box-shadow 0.2s;
 
   &::placeholder {
-    color: rgba(161, 161, 188, 0.35);
+    color: #000000b2;
   }
 
   &:focus {
-    border-color: rgba(99, 102, 241, 0.6);
+    border-color: #7251b599;
     background: rgba(99, 102, 241, 0.06);
-    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.14), inset 0 1px 0 rgba(255,255,255,0.04);
+    box-shadow:
+      0 0 0 3px rgba(99, 102, 241, 0.14),
+      inset 0 1px 0 rgba(255, 255, 255, 0.04);
   }
 `;
 
@@ -201,7 +222,7 @@ const SubmitBtn = styled.button`
   padding: 15px;
   border: none;
   border-radius: 12px;
-  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+  background: linear-gradient(135deg, #a06cd5 0%, #6247aa 100%);
   background-size: 200% auto;
   color: #fff;
   font-size: 15px;
@@ -211,15 +232,25 @@ const SubmitBtn = styled.button`
   letter-spacing: 0.2px;
   position: relative;
   overflow: hidden;
-  transition: transform 0.15s, box-shadow 0.2s;
-  box-shadow: 0 4px 20px rgba(99, 102, 241, 0.4);
-  display: flex; align-items: center; justify-content: center; gap: 8px;
+  transition:
+    transform 0.15s,
+    box-shadow 0.2s;
+  box-shadow: 0 4px 20px #6247aa66;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
 
   &::before {
-    content: '';
+    content: "";
     position: absolute;
     inset: 0;
-    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent);
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgba(255, 255, 255, 0.15),
+      transparent
+    );
     background-size: 200% auto;
     animation: ${shimmer} 2.5s linear infinite;
     opacity: 0;
@@ -228,11 +259,16 @@ const SubmitBtn = styled.button`
 
   &:hover:not(:disabled) {
     transform: translateY(-1px);
-    box-shadow: 0 8px 28px rgba(99, 102, 241, 0.5);
-    &::before { opacity: 1; }
+    box-shadow: 0 8px 28px #6247aa7f;
+
+    &::before {
+      opacity: 1;
+    }
   }
 
-  &:active:not(:disabled) { transform: translateY(0); }
+  &:active:not(:disabled) {
+    transform: translateY(0);
+  }
 
   &:disabled {
     opacity: 0.7;
@@ -242,8 +278,9 @@ const SubmitBtn = styled.button`
 `;
 
 const Spinner = styled.div`
-  width: 18px; height: 18px;
-  border: 2px solid rgba(255,255,255,0.3);
+  width: 18px;
+  height: 18px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
   border-top-color: #fff;
   border-radius: 50%;
   animation: ${spin} 0.7s linear infinite;
@@ -274,41 +311,39 @@ const BackLink = styled.p`
   text-align: center;
   margin: 28px 0 0;
   font-size: 13.5px;
-  color: rgba(161, 161, 188, 0.65);
+  color: #000000a5;
 
   a {
-    color: #818cf8;
+    color: #6247aa;
     font-weight: 600;
     text-decoration: none;
-    transition: color 0.2s;
-    &:hover { color: #a5b4fc; }
   }
 `;
 
 /* ─── Component ─── */
 export default function ResetPassword() {
-  const [email, setEmail]     = useState('');
+  const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
-  const [error, setError]     = useState('');
-  const [success, setSuccess] = useState('');
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
 
   const getFriendlyError = (code) => {
     const map = {
-      'auth/user-not-found':  'No account found with this email.',
-      'auth/invalid-email':   'Please enter a valid email address.',
-      'auth/too-many-requests': 'Too many attempts. Please wait and try again.',
+      "auth/user-not-found": "No account found with this email.",
+      "auth/invalid-email": "Please enter a valid email address.",
+      "auth/too-many-requests": "Too many attempts. Please wait and try again.",
     };
-    return map[code] || 'Something went wrong. Please try again.';
+    return map[code] || "Something went wrong. Please try again.";
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError('');
-    setSuccess('');
+    setError("");
+    setSuccess("");
     setLoading(true);
     try {
       await sendPasswordResetEmail(auth, email);
-      setSuccess('Reset link sent! Check your inbox.');
+      setSuccess("Reset link sent! Check your inbox.");
     } catch (err) {
       setError(getFriendlyError(err.code));
     } finally {
@@ -368,13 +403,13 @@ export default function ResetPassword() {
                   Sending...
                 </>
               ) : (
-                'Send Reset Link'
+                "Send Reset Link"
               )}
             </SubmitBtn>
           </form>
 
           <BackLink>
-            <Link to={'/'}>← Back to Sign In</Link>
+            <Link to={"/"}>← Back to Sign In</Link>
           </BackLink>
         </Card>
       </Page>
