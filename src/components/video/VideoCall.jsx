@@ -1,9 +1,10 @@
 import React, { useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 import AgoraRTC from 'agora-rtc-sdk-ng';
+import { useParams } from 'react-router-dom';
+
 
 const APP_ID = '2328e20f409b406da03122249af2fb94';
-const CHANNEL = '1234';
 
 const Wrapper = styled.div`
     display: flex;
@@ -38,6 +39,8 @@ const VideoBox = styled.div`
 `;
 
 export default function VideoCall() {
+
+    const {meetingId} = useParams()
     const localVideoRef = useRef(null);
     const [remoteVideoUsers, setRemoteVideoUsers] = useState([]);
 
@@ -77,7 +80,7 @@ export default function VideoCall() {
                 }
             });
 
-            await client.join(APP_ID, CHANNEL, null, null);
+            await client.join(APP_ID, meetingId, null, null);
 
             const audioTrack = await AgoraRTC.createMicrophoneAudioTrack();
             const videoTrack = await AgoraRTC.createCameraVideoTrack();

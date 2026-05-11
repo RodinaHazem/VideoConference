@@ -1,10 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import styled, { keyframes } from 'styled-components';
-import { auth } from '../../../firebase';
-import { useNavigate, Link, NavLink, Routes } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import Sidebar from '../common/sidebar/Sidebar';
 import diverseBusinesspeople from "../../../../public/assests/diverse-businesspeople-having-meeting (1).jpg";
+import { db, auth } from "../../../firebase"
 // import { log } from 'firebase/firestore/pipelines';
+import { v4 as uuidv4 } from "uuid"
+import { collection, addDoc, serverTimestamp } from "firebase/firestore"
+import toast from "react-hot-toast"
+
+
+
 
 const gradientShift = keyframes`
 	0%   { background-position: 0% 50%; }
@@ -109,13 +115,33 @@ const Blob3 = styled(Blob)`
 	transform: translate(-50%, -50%);
 	background: radial-gradient(circle, #815ac0 0%, transparent 70%);
 `;
-const Button = styled.button`
-    padding: 10px 20px;
-    background-color: #ff0000;
-    color: #ffffff;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
+const VideoCallButton = styled.button`
+	position: fixed;
+	bottom: 32px;
+	left: 50%;
+	transform: translateX(-50%);
+	z-index: 100;
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	padding: 14px 32px;
+	background: linear-gradient(135deg, #9163cb 0%, #6a3fa0 100%);
+	color: #ffffff;
+	font-size: 16px;
+	font-weight: 600;
+	letter-spacing: 0.04em;
+	border: none;
+	border-radius: 50px;
+	cursor: pointer;
+	box-shadow: 0 8px 24px rgba(145, 99, 203, 0.45);
+	transition: transform 0.2s ease, box-shadow 0.2s ease;
+	&:hover {
+		transform: translateX(-50%) translateY(-3px);
+		box-shadow: 0 12px 32px rgba(145, 99, 203, 0.65);
+	}
+	&:active {
+		transform: translateX(-50%) translateY(0px);
+	}
 `;
 
 const Container = styled.div`
@@ -169,6 +195,7 @@ const TimeString = styled.p`
 // 	margin-top: 50px;
 // `;
 export default function Home() {
+
 	const [now, setNow] = useState(new Date());
 
 	useEffect(() => {
@@ -188,14 +215,28 @@ export default function Home() {
 
 	});
 
-    const navigate = useNavigate()
-    const handlesignout = ()=>{
-        auth.signOut()
-        navigate("/")
-    }
-        const handlevideoCall = ()=>{
-        navigate("/VideoCall")
-    }
+	const navigate = useNavigate()
+
+	const createNewMeeting = async () => {
+		if (!auth.currentUser) {
+			toast.error("Please login first")
+			return
+		}
+		const meetingId = uuidv4()
+		const meetingLink = `${window.location.origin}/VideoCall/${meetingId}`
+		addDoc(collection(db, "meetings"), {
+			meetingId,
+			createdAt: serverTimestamp(),
+			createdBy: auth.currentUser.email,
+			meetingLink,
+			status: "active",
+			participants: [auth.currentUser.email],
+		}).catch((err) => console.error("Firestore write failed:", err))
+		navigator.clipboard.writeText(meetingLink)
+			.then(() => toast.success("Meeting link copied to clipboard!"))
+			.catch(() => {})
+		navigate(`/VideoCall/${meetingId}`)
+	}
 	return (
 		<>
 		<Page>
@@ -214,8 +255,10 @@ export default function Home() {
 						</DateTimeOverlay>
 					</ImageContainer>
 				
-			{/* <Button onClick={handlesignout}>Logout</Button>
-				<Button onClick={handlevideoCall}>VideoCall</Button>	 */}
+			{/* <Button onClick={handlesignout}>Logout</Button> */}
+			<VideoCallButton onClick={createNewMeeting}>
+				📹 New Meeting
+			</VideoCallButton>
 			</Container>
 		</Page>
 		</>
