@@ -2,7 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import { Link, NavLink, Routes } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faHouse, faVideo, faGear, faCircleUser } from '@fortawesome/free-solid-svg-icons';
+import { faHouse, faGear, faCircleUser } from '@fortawesome/free-solid-svg-icons';
 
 const SidebarContainer = styled("div")`
 	width: 100px;
@@ -104,9 +104,7 @@ export default function Sidebar() {
 						<ListItem to="/home">
 							<ItemIcon icon={faHouse}/>
 						</ListItem>
-						<ListItem to="/VideoCall">
-							<ItemIcon icon={faVideo}/>
-						</ListItem>
+				
 						<ListItem to="/settings">
 							<ItemIcon icon={faGear}/>
 						</ListItem>

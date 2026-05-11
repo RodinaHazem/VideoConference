@@ -5,11 +5,11 @@ import Login from "./components/auth/Login"
 import SignUp from "./components/auth/SignUp"
 import ResetPassword from "./components/auth/Resetpassword"
 import SetNewPassword from "./components/auth/Setnewpassword"
-import Home from "./components/ui/Home"
+import Home from "./components/ui/app/Home"
 import { useState, useEffect, useMemo } from "react"
 import { auth } from "./firebase"
 import VideoCall from "./components/ui/VideoCall"
-
+import Layout from "./components/ui/common/layout/Layout"
 
 const App = () => {
     const [user, setUser] = useState(null)
@@ -24,7 +24,12 @@ const App = () => {
     }, [])
 
     const router = useMemo(() => createBrowserRouter([
-        { path: "/", element: user ? <Home /> : <Login /> },
+        {
+            path: "/", element: user ? <Layout /> : <Login />,
+            children: [
+                { index: true, element: <Home /> },
+            ]
+        },
         { path: "/signup", element: user ? <Navigate to="/" /> : <SignUp /> },
         { path: "/reset-password", element: user ? <Navigate to="/" /> : <ResetPassword /> },
         { path: "/set-new-password", element: user ? <Navigate to="/" /> : <SetNewPassword /> },
