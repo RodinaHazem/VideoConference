@@ -213,6 +213,7 @@ const Card = styled("div")`
 		inset 0 0 5px #ffffff70;
 	text-decoration: none;
 	transition: all 0.2s ease-in-out;
+	cursor: pointer;
 	&:hover {
 		transform: scale(1.03);
 		box-shadow:
