@@ -202,7 +202,7 @@ const Cards = styled("div")`
 	gap: 20px;
 	margin-top: 50px;
 `;
-const Card = styled("button")`
+const Card = styled("div")`
 	width: 338px;
 	height: 200px;
 	padding: 20px;
