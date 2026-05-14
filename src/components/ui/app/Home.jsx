@@ -250,9 +250,155 @@ const CardTitle = styled("h2")`
 	text-overflow: ellipsis;
 	margin: 0 auto;
 `;
+
+const ModalOverlay = styled.div`
+	position: fixed;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	background: rgba(0, 0, 0, 0.5);
+	display: ${props => props.show ? 'flex' : 'none'};
+	align-items: center;
+	justify-content: center;
+	z-index: 1000;
+	backdrop-filter: blur(5px);
+	-webkit-backdrop-filter: blur(5px);
+`;
+
+const ModalContent = styled.div`
+	background: #ffffff6b;
+	border-radius: 16px;
+	padding: 48px;
+	width: 90%;
+	max-width: 450px;
+	box-shadow:
+		inset 1px 1px 0 #ffffff7c,
+		inset 0 0 5px #ffffff70;
+	animation: slideUp 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+	border: 1px solid rgba(145, 99, 203, 0.1);
+
+	@keyframes slideUp {
+		from {
+			transform: translateY(30px);
+			opacity: 0;
+		}
+		to {
+			transform: translateY(0);
+			opacity: 1;
+		}
+	}
+`;
+const ModalTitle = styled.h2`
+	color: #000;
+	font-size: 28px;
+	margin: 0 0 8px 0;
+	font-weight: 700;
+	letter-spacing: -0.5px;
+`;
+const ModalSubtitle = styled.p`
+	color: #00000095;
+	font-size: 14px;
+	margin: 0 0 32px 0;
+	line-height: 1.5;
+	font-weight: 500;
+`;
+const HelperText = styled.div`
+	background: rgba(146, 99, 203, 0.293);
+	border-left: 3px solid #9163cb;
+	padding: 12px 16px;
+	border-radius: 6px;
+	margin-bottom: 24px;
+	font-size: 13px;
+	color: #00000095;
+	line-height: 1.5;
+`;
+const ModalInput = styled.input`
+	width: 100%;
+	padding: 14px 16px;
+	font-size: 16px;
+	border: 2px solid #575757;
+	border-radius: 10px;
+	background: #ffffff6c;
+	box-sizing: border-box;
+	margin-bottom: 24px;
+	transition: all 0.2s ease;
+	font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+	letter-spacing: 0.3px;
+
+	&:focus {
+		outline: none;
+		border-color: #815ac0;
+		background: #ffffffc8;
+		box-shadow: 0 0 0 4px rgba(145, 99, 203, 0.12);
+	}
+
+	&:hover:not(:focus) {
+		border-color: #6b6b6b;
+		background: #ffffffa3;
+	}
+
+	&::placeholder {
+		color: #00000095;
+	}
+`;
+const ModalButtonGroup = styled.div`
+	display: flex;
+	gap: 12px;
+	width: 100%;
+`;
+const ModalButton = styled.button`
+	flex: 1;
+	padding: 13px 24px;
+	font-size: 15px;
+	font-weight: 600;
+	border: none;
+	border-radius: 10px;
+	cursor: pointer;
+	transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+	letter-spacing: 0.3px;
+
+	${props => props.primary ? `
+		background: linear-gradient(135deg, #a06cd5 0%, #6247aa 100%);
+		color: #fff;
+		box-shadow: 0 4px 20px #6247aa66;
+		
+		&:hover:not(:disabled) {
+			transform: translateY(-1px);
+			box-shadow: 0 8px 28px #6247aa7f;
+		}
+
+		&:active:not(:disabled) {
+			transform: translateY(0);
+		}
+
+		&:disabled {
+			opacity: 0.7;
+			cursor: not-allowed;
+			transform: none;
+		}
+	` : `
+		background: #f0f0f0;
+		color: #1a1a1a;
+		border: 1px solid #e0e0e0;
+
+		&:hover {
+			background: #e8e8e8;
+			border-color: #d8d8d8;
+		}
+
+		&:active {
+			background: #e0e0e0;
+		}
+	`}
+`;
+
+
 export default function Home() {
 
 	const [now, setNow] = useState(new Date());
+	const [showJoinModal, setShowJoinModal] = useState(false);
+	const [joinMeetingCode, setJoinMeetingCode] = useState('');
 
 	useEffect(() => {
 		const timer = setInterval(() => setNow(new Date()), 1000);
@@ -291,7 +437,54 @@ export default function Home() {
 		navigator.clipboard.writeText(meetingLink)
 			.then(() => toast.success("Meeting link copied to clipboard!"))
 			.catch(() => {})
+		toast.success("Starting your meeting...")
 		navigate(`/VideoCall/${meetingId}`)
+	}
+
+	const joinMeeting = () => {
+		if (!joinMeetingCode.trim()) {
+			toast.error("Please enter a meeting link or code to continue")
+			return
+		}
+		if (!auth.currentUser) {
+			toast.error("Please sign in to join a meeting")
+			return
+		}
+		
+		let meetingId = joinMeetingCode.trim()
+		
+		if (meetingId.includes('VideoCall/')) {
+			try {
+				const url = new URL(meetingId)
+				meetingId = url.pathname.split('VideoCall/')[1]
+				if (!meetingId) {
+					toast.error("Unable to extract meeting ID from the link")
+					return
+				}
+	
+			} catch (err) {
+				const match = meetingId.match(/VideoCall\/([^\/?]+)/)
+				if (match && match[1]) {
+					meetingId = match[1]
+				} else {
+					toast.error("Invalid meeting link format. Please check and try again.")
+					return
+				}
+			}
+		}
+		
+		toast.success("Joining meeting...")
+		setShowJoinModal(false)
+		setJoinMeetingCode('')
+		navigate(`/VideoCall/${meetingId}`)
+	}
+
+	const handleOpenJoinModal = () => {
+		if (!auth.currentUser) {
+			toast.error("Please sign in to join a meeting")
+			return
+		}
+		setShowJoinModal(true)
 	}
 	return (
 		<>
@@ -319,10 +512,10 @@ export default function Home() {
 								<CardTitle>
 									New Meeting
 								</CardTitle>
-								Setup a new recording
+							Start a new video conference
 							</CardDetails>
 						</Card>
-						<Card bg="#0800ff71" >
+						<Card bg="#0800ff71" onClick={handleOpenJoinModal}>
 							<CardLogo width="36" height="36" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
 								<path d="M23.8466 22.5844C24.6974 22.1273 25.6712 21.8672 26.7083 21.8672H26.7118C26.8173 21.8672 26.8665 21.7406 26.7892 21.6703C25.7106 20.7024 24.4786 19.9206 23.1434 19.357C23.1294 19.35 23.1153 19.3465 23.1013 19.3395C25.2845 17.7539 26.7048 15.177 26.7048 12.2695C26.7048 7.45312 22.8095 3.55078 18.0036 3.55078C13.1977 3.55078 9.30595 7.45312 9.30595 12.2695C9.30595 15.177 10.7263 17.7539 12.913 19.3395C12.8989 19.3465 12.8849 19.35 12.8708 19.357C11.2993 20.0215 9.88954 20.9742 8.67665 22.1906C7.47076 23.3943 6.51072 24.8213 5.85009 26.3918C5.20009 27.9298 4.8493 29.5775 4.81649 31.2469C4.81556 31.2844 4.82214 31.3217 4.83585 31.3567C4.84956 31.3916 4.87013 31.4234 4.89634 31.4503C4.92255 31.4772 4.95388 31.4985 4.98847 31.5131C5.02305 31.5277 5.06021 31.5352 5.09774 31.5352H7.2036C7.35478 31.5352 7.48134 31.4121 7.48485 31.2609C7.55517 28.5469 8.64149 26.0051 10.5645 24.0785C12.5509 22.0852 15.1946 20.9883 18.0071 20.9883C20.0005 20.9883 21.913 21.5402 23.5618 22.5738C23.6042 22.6004 23.6528 22.6154 23.7028 22.6173C23.7528 22.6191 23.8024 22.6078 23.8466 22.5844ZM18.0071 18.3164C16.397 18.3164 14.8817 17.6871 13.7392 16.5445C13.177 15.9838 12.7313 15.3174 12.4278 14.5837C12.1243 13.85 11.969 13.0635 11.9708 12.2695C11.9708 10.6559 12.6001 9.13711 13.7392 7.99453C14.8782 6.85195 16.3934 6.22266 18.0071 6.22266C19.6208 6.22266 21.1325 6.85195 22.2751 7.99453C22.8373 8.55524 23.2829 9.22164 23.5864 9.95534C23.8899 10.689 24.0452 11.4755 24.0434 12.2695C24.0434 13.8832 23.4142 15.402 22.2751 16.5445C21.1325 17.6871 19.6173 18.3164 18.0071 18.3164ZM30.9376 26.6836H27.9845V23.7305C27.9845 23.5758 27.8579 23.4492 27.7032 23.4492H25.7345C25.5798 23.4492 25.4532 23.5758 25.4532 23.7305V26.6836H22.5001C22.3454 26.6836 22.2188 26.8102 22.2188 26.9648V28.9336C22.2188 29.0883 22.3454 29.2148 22.5001 29.2148H25.4532V32.168C25.4532 32.3227 25.5798 32.4492 25.7345 32.4492H27.7032C27.8579 32.4492 27.9845 32.3227 27.9845 32.168V29.2148H30.9376C31.0923 29.2148 31.2188 29.0883 31.2188 28.9336V26.9648C31.2188 26.8102 31.0923 26.6836 30.9376 26.6836Z" fill="white"/>
 							</CardLogo>
@@ -330,7 +523,7 @@ export default function Home() {
 								<CardTitle>
 									Join Meeting
 								</CardTitle>
-								via invitation link
+							Connect using a meeting code
 							</CardDetails>
 						</Card>
 						<Card bg="#a600ff71">
@@ -369,6 +562,36 @@ export default function Home() {
 				<Button onClick={handlevideoCall}>VideoCall</Button>	 */}
 			</Container>
 		</Page>
+		
+		<ModalOverlay show={showJoinModal} onClick={() => setShowJoinModal(false)}>
+			<ModalContent onClick={(e) => e.stopPropagation()}>
+				<ModalTitle>Join Meeting</ModalTitle>
+				<ModalSubtitle>Access your meeting instantly</ModalSubtitle>
+				<HelperText>
+					💡 Paste the meeting link or enter the meeting code shared with you
+				</HelperText>
+				<ModalInput 
+					type="text"
+					placeholder="Paste link or enter code..."
+					value={joinMeetingCode}
+					onChange={(e) => setJoinMeetingCode(e.target.value)}
+					onKeyPress={(e) => {
+						if (e.key === 'Enter') {
+							joinMeeting()
+						}
+					}}
+					autoFocus
+				/>
+				<ModalButtonGroup>
+					<ModalButton onClick={() => setShowJoinModal(false)}>
+						Cancel
+					</ModalButton>
+					<ModalButton primary onClick={joinMeeting}>
+						Join Meeting
+					</ModalButton>
+				</ModalButtonGroup>
+			</ModalContent>
+		</ModalOverlay>
 		</>
 	)
-}   
+}
