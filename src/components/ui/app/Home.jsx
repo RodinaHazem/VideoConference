@@ -453,7 +453,6 @@ export default function Home() {
 		
 		let meetingId = joinMeetingCode.trim()
 		
-		// If it's a full URL, extract the meeting ID
 		if (meetingId.includes('VideoCall/')) {
 			try {
 				const url = new URL(meetingId)
@@ -462,7 +461,7 @@ export default function Home() {
 					toast.error("Unable to extract meeting ID from the link")
 					return
 				}
-			// eslint-disable-next-line no-unused-vars
+	
 			} catch (err) {
 				const match = meetingId.match(/VideoCall\/([^\/?]+)/)
 				if (match && match[1]) {

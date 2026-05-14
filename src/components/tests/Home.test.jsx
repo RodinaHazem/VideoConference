@@ -2,6 +2,7 @@ import { screen, render, fireEvent, waitFor } from "@testing-library/react"
 import { MemoryRouter } from "react-router-dom"
 import { describe, test, expect, beforeEach, afterEach, vi } from "vitest"
 
+// ── Mocks ──────────────────────────────────────────────────────────────────
 vi.mock("../../firebase", () => ({
     auth: { currentUser: null },
     db: {},
@@ -13,36 +14,31 @@ vi.mock("firebase/firestore", () => ({
     serverTimestamp: vi.fn(() => "SERVER_TIMESTAMP"),
 }))
 
-
 vi.mock("react-hot-toast", () => ({
-    default: {
-        error: vi.fn(),
-        success: vi.fn(),
-    },
+    default: { error: vi.fn(), success: vi.fn() },
 }))
 
 vi.mock("uuid", () => ({
     v4: vi.fn(() => "test-meeting-uuid-1234"),
 }))
+
 const mockNavigate = vi.fn()
 vi.mock("react-router-dom", async (importOriginal) => {
     const actual = await importOriginal()
-    return {
-        ...actual,
-        useNavigate: () => mockNavigate,
-    }
+    return { ...actual, useNavigate: () => mockNavigate }
 })
 
 vi.mock("../ui/common/sidebar/Sidebar", () => ({
     default: () => <div data-testid="sidebar">Sidebar</div>,
 }))
 
+// ── Imports (must come after vi.mock calls) ────────────────────────────────
 import Home from "../ui/app/Home"
 import { auth } from "../../firebase"
 import { addDoc } from "firebase/firestore"
 import toast from "react-hot-toast"
 
-
+// ── Helpers ────────────────────────────────────────────────────────────────
 function renderHome() {
     return render(
         <MemoryRouter>
@@ -51,14 +47,11 @@ function renderHome() {
     )
 }
 
-
 beforeEach(() => {
     mockNavigate.mockClear()
     vi.mocked(toast.error).mockClear()
     vi.mocked(toast.success).mockClear()
     vi.mocked(addDoc).mockClear()
-
-    // Provide a writable clipboard mock
     Object.defineProperty(navigator, "clipboard", {
         value: { writeText: vi.fn(() => Promise.resolve()) },
         writable: true,
@@ -66,132 +59,102 @@ beforeEach(() => {
     })
 })
 
+// ── Card titles ────────────────────────────────────────────────────────────
+// Use getByRole('heading') to avoid false matches on the modal title/button
 describe("Card titles", () => {
-    test("renders 'New Meeting' card title", () => {
-        renderHome()
-        expect(screen.getByText(/New Meeting/i)).toBeInTheDocument()
-    })
+  test("renders 'New Meeting' card title", () => {
+    renderHome()
+    expect(screen.getByRole("heading", { name: /New Meeting/i })).toBeInTheDocument()
+  })
 
-    test("renders 'Join Meeting' card title", () => {
-        renderHome()
-        expect(screen.getByText(/Join Meeting/i)).toBeInTheDocument()
-    })
+  test("renders 'Join Meeting' card title", () => {
+    renderHome()
+    // getAllByRole because the modal also has a 'Join Meeting' heading; we just need at least one
+    expect(screen.getAllByRole("heading", { name: /Join Meeting/i })[0]).toBeInTheDocument()
+  })
 
-    test("renders 'Schedule Meeting' card title", () => {
-        renderHome()
-        expect(screen.getByText(/Schedule Meeting/i)).toBeInTheDocument()
-    })
+  test("renders 'Schedule Meeting' card title", () => {
+    renderHome()
+    expect(screen.getByRole("heading", { name: /Schedule Meeting/i })).toBeInTheDocument()
+  })
 
-    test("renders 'View Recordings' card title", () => {
-        renderHome()
-        expect(screen.getByText(/View Recordings/i)).toBeInTheDocument()
-    })
+  test("renders 'View Recordings' card title", () => {
+    renderHome()
+    expect(screen.getByRole("heading", { name: /View Recordings/i })).toBeInTheDocument()
+  })
 })
 
-
+// ── Card subtitles ─────────────────────────────────────────────────────────
 describe("Card subtitles", () => {
-    test("renders 'Setup a new recording' subtitle under New Meeting", () => {
+    test.each([
+        ["Start a new video conference"],
+        ["Connect using a meeting code"],
+        ["Plan your meeting"],
+        ["Managing recordings"],
+    ])("renders subtitle '%s'", (subtitle) => {
         renderHome()
-        expect(screen.getByText(/Setup a new recording/i)).toBeInTheDocument()
-    })
-
-    test("renders 'via invitation link' subtitle under Join Meeting", () => {
-        renderHome()
-        expect(screen.getByText(/via invitation link/i)).toBeInTheDocument()
-    })
-
-    test("renders 'Plan your meeting' subtitle under Schedule Meeting", () => {
-        renderHome()
-        expect(screen.getByText(/Plan your meeting/i)).toBeInTheDocument()
-    })
-
-    test("renders 'Managing recordings' subtitle under View Recordings", () => {
-        renderHome()
-        expect(screen.getByText(/Managing recordings/i)).toBeInTheDocument()
+        expect(screen.getByText(new RegExp(subtitle, "i"))).toBeInTheDocument()
     })
 })
 
+// ── Live clock overlay ─────────────────────────────────────────────────────
 describe("Live clock overlay", () => {
-    test("renders the current year in the date overlay", () => {
+    test("renders current year in the date overlay", () => {
         renderHome()
-        const year = new Date().getFullYear().toString()
-        expect(screen.getByText(new RegExp(year))).toBeInTheDocument()
+        expect(
+            screen.getByText(new RegExp(new Date().getFullYear().toString()))
+        ).toBeInTheDocument()
     })
 
-    test("renders a time string in 12-hour AM/PM format", () => {
+    test("renders time in 12-hour AM/PM format", () => {
         renderHome()
         expect(screen.getByText(/\d{2}:\d{2}\s*(AM|PM)/i)).toBeInTheDocument()
     })
 })
 
-
-describe("Sidebar", () => {
-    test("renders the Sidebar component", () => {
-        renderHome()
-        expect(screen.getByTestId("sidebar")).toBeInTheDocument()
-    })
+// ── Sidebar ────────────────────────────────────────────────────────────────
+test("renders the Sidebar component", () => {
+    renderHome()
+    expect(screen.getByTestId("sidebar")).toBeInTheDocument()
 })
 
+// ── New Meeting – unauthenticated ──────────────────────────────────────────
 describe("New Meeting – unauthenticated user", () => {
-    beforeEach(() => {
-        auth.currentUser = null
-    })
+    beforeEach(() => { auth.currentUser = null })
 
     test("shows an error toast when not logged in", () => {
         renderHome()
-        fireEvent.click(screen.getByText(/New Meeting/i))
+        // Click the card heading, not the modal button
+        fireEvent.click(screen.getByRole("heading", { name: /New Meeting/i }))
         expect(toast.error).toHaveBeenCalledWith("Please login first")
     })
 
-    test("does NOT navigate when not logged in", () => {
+    test("does NOT navigate, call addDoc, or write clipboard when not logged in", () => {
         renderHome()
-        fireEvent.click(screen.getByText(/New Meeting/i))
+        fireEvent.click(screen.getByRole("heading", { name: /New Meeting/i }))
         expect(mockNavigate).not.toHaveBeenCalled()
-    })
-
-    test("does NOT call addDoc when not logged in", () => {
-        renderHome()
-        fireEvent.click(screen.getByText(/New Meeting/i))
         expect(addDoc).not.toHaveBeenCalled()
-    })
-
-    test("does NOT write to clipboard when not logged in", () => {
-        renderHome()
-        fireEvent.click(screen.getByText(/New Meeting/i))
         expect(navigator.clipboard.writeText).not.toHaveBeenCalled()
     })
 })
 
+// ── New Meeting – authenticated ────────────────────────────────────────────
 describe("New Meeting – authenticated user", () => {
-    beforeEach(() => {
-        auth.currentUser = { email: "user@example.com" }
-    })
+    beforeEach(() => { auth.currentUser = { email: "user@example.com" } })
+    afterEach(() => { auth.currentUser = null })
 
-    afterEach(() => {
-        auth.currentUser = null
-    })
-
-    test("navigates to /VideoCall/<uuid> after creating a meeting", async () => {
+    test("navigates to /VideoCall/<uuid> and persists meeting in Firestore", async () => {
         renderHome()
-        fireEvent.click(screen.getByText(/New Meeting/i))
+        fireEvent.click(screen.getByRole("heading", { name: /New Meeting/i }))
         await waitFor(() => {
-            expect(mockNavigate).toHaveBeenCalledWith(
-                "/VideoCall/test-meeting-uuid-1234"
-            )
-        })
-    })
-
-    test("calls addDoc to persist the meeting in Firestore", async () => {
-        renderHome()
-        fireEvent.click(screen.getByText(/New Meeting/i))
-        await waitFor(() => {
+            expect(mockNavigate).toHaveBeenCalledWith("/VideoCall/test-meeting-uuid-1234")
             expect(addDoc).toHaveBeenCalled()
         })
     })
 
-    test("copies the meeting link (containing the uuid) to clipboard", async () => {
+    test("copies meeting link containing uuid to clipboard", async () => {
         renderHome()
-        fireEvent.click(screen.getByText(/New Meeting/i))
+        fireEvent.click(screen.getByRole("heading", { name: /New Meeting/i }))
         await waitFor(() => {
             expect(navigator.clipboard.writeText).toHaveBeenCalledWith(
                 expect.stringContaining("test-meeting-uuid-1234")
@@ -201,7 +164,7 @@ describe("New Meeting – authenticated user", () => {
 
     test("does NOT show an error toast when logged in", () => {
         renderHome()
-        fireEvent.click(screen.getByText(/New Meeting/i))
+        fireEvent.click(screen.getByRole("heading", { name: /New Meeting/i }))
         expect(toast.error).not.toHaveBeenCalled()
     })
 })
